@@ -1,4 +1,5 @@
 # NDVI Calculator
+The following script is designed to calculate NDVI values for Landsat images (tif) files in R
 
 Steps this code walks through.
  - Get data for CRD, summer 2018
