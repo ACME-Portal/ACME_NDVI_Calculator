@@ -126,8 +126,10 @@ mapview(landsat_2_ndvi)
 
 ### Part 3 - Load the rest of the 2018 images -----
 
-### 2018_04_26 ---
-landsat_1 <- list.files("Data/Landsat/2018/LC080480262018042601T1-SC20200204205123.tar", 
+folder_location <- "E:/Wylie 2019/Oak Bay Deer/Spatial Data/Landsat"
+
+### L1 ----
+landsat_1 <- list.files(paste(folder_location, "/2018/L1_LC080470262018050501T1-SC20200204205109.tar", sep = ""), 
                         pattern = glob2rx("*band*.tif$"),
                         full.names = TRUE)
 # Stack bands
@@ -139,24 +141,43 @@ landsat_1_ndvi <- (landsat_1[[5]] - landsat_1[[4]]) / (landsat_1[[5]] + landsat_
 hist(freq(landsat_1_ndvi))
 
 
-
 # Reclassify below zero
 landsat_1_ndvi <- reclassify(landsat_1_ndvi, cbind(-Inf, 0, NA), right=FALSE)
 
 # Rescale above 1
 # test <- landsat_1_ndvi[landsat_1_ndvi > 1, drop = FALSE]
 ## This DOESN'T work. DROP = FALSE is good though - it keeps the raster instead of converting to a matrix!
-mapview(test)
+# mapview(test)
 
 # Convert values above 1 to NA
 landsat_1_ndvi <- reclassify(landsat_1_ndvi, cbind(1, 961, NA), right=TRUE)
 # test using +Inf instead of a real number here - max pixel value of 961 is arbitrary
 mapview(landsat_1_ndvi)
+
+
+
+### L2  ----
+landsat_2 <- list.files(paste(folder_location, "/2018/L2_LC080470262018072401T1-SC20200204205121.tar", sep = ""), 
+                        pattern = glob2rx("*band*.tif$"),
+                        full.names = TRUE)
+# Stack bands
+landsat_2 <- stack(landsat_2) %>% brick()  
+
+# Calculate NDVI 
+landsat_2_ndvi <- (landsat_2[[5]] - landsat_2[[4]]) / (landsat_2[[5]] + landsat_2[[4]])
+hist(freq(landsat_2_ndvi))
+
+# Reclassify below zero
+landsat_2_ndvi <- reclassify(landsat_2_ndvi, cbind(-Inf, 0, NA), right=FALSE)
+
+# Reclassify above zero
+landsat_2_ndvi <- reclassify(landsat_2_ndvi, cbind(1, 961, NA), right=TRUE)
 mapview(landsat_2_ndvi)
 
 
-### 2018_07_15  ---
-landsat_3 <- list.files("Data/Landsat/2018/LC080480262018071501T1-SC20200204205116.tar", 
+
+### L3  ----
+landsat_3 <- list.files(paste(folder_location, "/2018/L3_LC080470262018080901T1-SC20200204205117.tar", sep = ""), 
                         pattern = glob2rx("*band*.tif$"),
                         full.names = TRUE)
 # Stack bands
@@ -169,14 +190,14 @@ hist(freq(landsat_3_ndvi))
 # Reclassify below zero
 landsat_3_ndvi <- reclassify(landsat_3_ndvi, cbind(-Inf, 0, NA), right=FALSE)
 
-# Reclassify above zero
+# Convert values above 1 to NA
 landsat_3_ndvi <- reclassify(landsat_3_ndvi, cbind(1, 961, NA), right=TRUE)
+# test using +Inf instead of a real number here
 mapview(landsat_3_ndvi)
 
 
-
-### 2018_07_24  ---
-landsat_4 <- list.files("Data/Landsat/2018/LC080470262018072401T1-SC20200204205121.tar", 
+### L4  ----
+landsat_4 <- list.files(paste(folder_location, "/2018/L4_LC080470262018092601T1-SC20200204205031.tar", sep = ""), 
                         pattern = glob2rx("*band*.tif$"),
                         full.names = TRUE)
 # Stack bands
@@ -190,13 +211,12 @@ hist(freq(landsat_4_ndvi))
 landsat_4_ndvi <- reclassify(landsat_4_ndvi, cbind(-Inf, 0, NA), right=FALSE)
 
 # Convert values above 1 to NA
-landsat_4_ndvi <- reclassify(landsat_4_ndvi, cbind(1, 961, NA), right=TRUE)
-# test using +Inf instead of a real number here
+landsat_4_ndvi <- reclassify(landsat_4_ndvi, cbind(1, +Inf, NA), right=TRUE)
+mapview(landsat_4_ndvi)
 
 
-
-### 2018_08_09  ---
-landsat_5 <- list.files("Data/Landsat/2018/LC080470262018080901T1-SC20200204205117.tar", 
+### L5  ----
+landsat_5 <- list.files(paste(folder_location, "/2018/L5_LC080480262018042601T1-SC20200204205123.tar", sep = ""), 
                         pattern = glob2rx("*band*.tif$"),
                         full.names = TRUE)
 # Stack bands
@@ -210,12 +230,12 @@ hist(freq(landsat_5_ndvi))
 landsat_5_ndvi <- reclassify(landsat_5_ndvi, cbind(-Inf, 0, NA), right=FALSE)
 
 # Convert values above 1 to NA
-landsat_5_ndvi <- reclassify(landsat_5_ndvi, cbind(1, 961, NA), right=TRUE)
+landsat_5_ndvi <- reclassify(landsat_5_ndvi, cbind(1, +Inf, NA), right=TRUE)
+mapview(landsat_5_ndvi)
 
 
-
-### 2018_09_26  ---
-landsat_6 <- list.files("Data/Landsat/2018/LC080470262018092601T1-SC20200204205031.tar", 
+### L6  ----
+landsat_6 <- list.files(paste(folder_location, "/2018/L6_LC080480262018071501T1-SC20200204205116.tar", sep = ""), 
                         pattern = glob2rx("*band*.tif$"),
                         full.names = TRUE)
 # Stack bands
@@ -229,8 +249,8 @@ hist(freq(landsat_6_ndvi))
 landsat_6_ndvi <- reclassify(landsat_6_ndvi, cbind(-Inf, 0, NA), right=FALSE)
 
 # Convert values above 1 to NA
-landsat_6_ndvi <- reclassify(landsat_6_ndvi, cbind(1, 961, NA), right=TRUE)
-
+landsat_6_ndvi <- reclassify(landsat_6_ndvi, cbind(1, +Inf, NA), right=TRUE)
+mapview(landsat_6_ndvi)
 
 
 ### Part 4 - Crop Images, Stack images, Calculate Mean  ------
@@ -260,7 +280,6 @@ study_area <- st_transform(study_area, crs = crs_landsat)
 study_area_sp <- study_area %>% as("Spatial")
 
 landsat_1_ndvi_crop <- crop(landsat_1_ndvi, study_area_sp)
-mapview(landsat_1_ndvi_crop)
 ### Note - have to crop 0 values from the coastline to make the focal statistics work
 landsat_2_ndvi_crop <- crop(landsat_2_ndvi, study_area_sp)
 landsat_3_ndvi_crop <- crop(landsat_3_ndvi, study_area_sp)
@@ -268,8 +287,18 @@ landsat_4_ndvi_crop <- crop(landsat_4_ndvi, study_area_sp)
 landsat_5_ndvi_crop <- crop(landsat_5_ndvi, study_area_sp)
 landsat_6_ndvi_crop <- crop(landsat_6_ndvi, study_area_sp)
 
+# View rasters before stacking
+mapview(landsat_1_ndvi_crop)
+mapview(landsat_2_ndvi_crop)
+mapview(landsat_3_ndvi_crop)
+mapview(landsat_4_ndvi_crop)
+mapview(landsat_5_ndvi_crop)
+mapview(landsat_6_ndvi_crop)
+
 ## Stack rasters --
 ndvi_stack <- stack(landsat_1_ndvi_crop, landsat_2_ndvi_crop, landsat_3_ndvi_crop, landsat_4_ndvi_crop, landsat_5_ndvi_crop, landsat_6_ndvi_crop)
+# View rasters from the stack
+mapview(ndvi_stack$layer.5)  # plot these and make sure they're different
 mapview(ndvi_stack$layer.6)  # plot these and make sure they're different
 
 
@@ -280,3 +309,8 @@ mapview(ndvi_mean)
 
 writeRaster(ndvi_mean, "Data/ndvi_mean.tif", "GTiff")
 # Write final raster
+
+
+
+### Part 5 - Crop NDVI mean to coastline  ------
+
