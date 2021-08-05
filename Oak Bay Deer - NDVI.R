@@ -313,4 +313,54 @@ writeRaster(ndvi_mean, "Data/ndvi_mean.tif", "GTiff")
 
 
 ### Part 5 - Crop NDVI mean to coastline  ------
+st_write(study_area, "study_area.shp")
+mapview(study_area)
 
+study_area <- study_area %>% st_transform(crs = 3005)
+
+# Intersecting coastlines with the polygon still doesn't keep the outer study area feature
+data_directory <- "E:/Wylie 2019/Oak Bay Deer/"
+coastlines <- st_read(paste(data_directory, "Spatial Data/coastlines_clip_large.shp", sep = ""), crs = 3005)
+mapview(coastlines)
+mapview(st_intersection(coastlines, study_area))
+
+# Convert study area polygon to lines
+test <- study_area %>% st_cast("MULTILINESTRING")
+mapview(test)
+
+# Union two line features - study area and coastlines
+t_union <- st_union(test, coastlines)
+mapview(t_union)
+st_write(t_union, paste(data_directory, "Spatial Data/t_union.shp", sep = ""))
+# Polygonize didn't work in R - just made a massive square again
+
+## Convert to polygon in ArcGIS -
+# Tool: "Feature to Polygon"
+# In: "t_union.shp"
+# Out: "t_polygon_1.shp"
+# Python Snippet:  arcpy.FeatureToPolygon_management(in_features="t_union", out_feature_class="E:/Wylie 2019/Oak Bay Deer/t_polygon_1.shp", 
+# cluster_tolerance="", attributes="ATTRIBUTES", label_features="") 
+
+# Selected ocean polygons -> "Switch Selection" -> Saved layer -> clipped excess stuff out -> saved as "Vic_Land_Mass_Clip.shp"
+
+# Load land layer - 
+land <- st_read(paste(data_directory, "Spatial Data/Vic_Land_Mass_Clip.shp", sep = ""), crs = 3005)
+mapview(land)
+# Whooo!
+
+
+### Part 5 -- Mask rasters to land surfaces -------
+crs(ndvi_mean)
+crs(land)
+
+land <- st_transform(land, crs = "+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs")
+# Usually easier to transform sf object crs than raster object crs
+
+ndvi_mean <- raster::mask(ndvi_mean, land)
+tree_cover <- mask(tree_cover, land)
+imp_surface_density <- mask(imp_surface_density, land)
+
+mapview(ndvi_mean)  # This worked!
+
+# Save it
+writeRaster(ndvi_mean, paste(data_directory, "NDVI_mean.tif", sep = ""))
