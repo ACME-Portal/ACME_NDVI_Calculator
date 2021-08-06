@@ -41,26 +41,9 @@ library(Hmisc)
 # Calculate NDVI
 # Average NDVI for summer months
 
-### Part 1 -- Load Landsat Layers ------ 
-# Source - https://www.earthdatascience.org/courses/earth-analytics/multispectral-remote-sensing-data/landsat-data-in-r-geotiff/
-options(stringsAsFactors = FALSE)  # Turn off factors
-
-# Folder LC080470262018050501T1-SC20200204205109 -- Image: LC08_L1TP_047026_20180505_20180517
-landsat_2 <- list.files("Landsat/Wilmore/LE070450222009072501T1-SC20200703175144.tar", 
-                      pattern = glob2rx("*band*.tif$"),
-                      full.names = TRUE)
-
-
-### Stack bands in Landsat Images ---
-landsat_2 <- stack(landsat_2) %>% brick()  
-
-### View data ---
-mapview::viewRGB(landsat_2, r = 4, g = 3, b = 2)
-# Looks dark, but good. Veg is green, water is blue, urban is grey, snow is white, Frazer plume is silty.
-
-
-
 ### Part 2 -- NDVI ------
+
+### DO NOT RUN - code starts in Part 3 -------
 
 # Option 1) NDVI manually 
 landsat_2_ndvi <- (landsat_2[[5]] - landsat_2[[4]]) / (landsat_2[[5]] + landsat_2[[4]])
@@ -364,3 +347,19 @@ mapview(ndvi_mean)  # This worked!
 
 # Save it
 writeRaster(ndvi_mean, paste(data_directory, "NDVI_mean.tif", sep = ""))
+
+
+
+### Part 6 - Run focal stats on land-cover layers with a 500m circular window, calculating the mean -----
+# raster:: focalWeight(), then raster::focal()
+
+# Calculate a focal weight matrix for use in the focal() function
+fwmatrix <- focalWeight(ndvi_mean, 50, type = "circle")  # units of distance are those of the crs
+
+# fwmatrix has values of 0.076923 for all values in the circle. Assign these to "1"
+fwmatrix[fwmatrix > 0] <- 1
+
+# Focal statistics
+ndvi_mean_focal50 <- focal(ndvi_mean, fwmatrix, fun=mean, filename = paste(data_directory, "ndvi_mean_focal50.tif", sep = ""), overwrite = T)
+mapview(ndvi_mean_focal50) # This looks good!
+
