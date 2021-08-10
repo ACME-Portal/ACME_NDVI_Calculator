@@ -33,13 +33,38 @@ library(GmAMisc)
 library(BAMMtools)
 library(Hmisc)
 
-
 ## Steps ---
 # Get data for CRD, summer 2018
 # Download data, load into R
 # Stack datasets 
 # Calculate NDVI
 # Average NDVI for summer months
+
+
+### Part 1 - Get data --------
+# Datasets from: https://earthexplorer.usgs.gov/
+# Create an account and log in to download images
+
+# SEARCH CRITERIA Tab - 
+# 1) Click on the map to create a polygon over the area you want to search images for, or zoom to the area and click "Use Map"
+#### for a bounding box that matches your screen's view. 
+#### All images whose bounaries TOUCH your bounding box will be selected; therefore, you can make your bounding box smaller than you'd expect 
+# 2) Select a date range 
+# 3) On the same box with the date selection, click the tab that says "Cloud Cover", and select a cover range. Be bold, but don't be afraid to dial 
+#### it back if you need images. There are no pixel mathematics operations that allow you to see through clouds, but you can average pixel values across many partially-cloudy images
+
+# DATA SETS Tab - 
+# 3) Select Landsat 7 or 8 "Collection 2 Level 1" - Top of Atmosphere Reflectance with some corrections applied 
+## -- https://www.usgs.gov/core-science-systems/nli/landsat/landsat-collection-2-level-1-data?qt-science_support_page_related_con=1#qt-science_support_page_related_con
+## -- https://www.usgs.gov/core-science-systems/nli/landsat/landsat-collection-2-level-2-science-products
+# DON'T select "ARD - Analysis Ready Data" - these screw up some steps in ArcMap, but you could try them out in R. They may screw up NDVI calaculation. 
+
+# RESULTS Tab - 
+# 4) Click on "Show Browse Overlay" 
+# 5) Download scene 
+
+# Store zipped files as .tar. You can read .tar files without unzipping uzing the code below. 
+
 
 ### Part 2 -- NDVI ------
 
